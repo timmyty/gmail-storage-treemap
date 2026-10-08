@@ -4,6 +4,10 @@ A local Gmail storage explorer inspired by WizTree. See which senders and messag
 
 Gmail Storage Treemap is a Python/Tkinter desktop app built for Windows. It uses the Python standard library only, with no pip dependencies, hosted backend, or telemetry.
 
+![Gmail Storage Treemap in demo mode: storage groups on the left, a sender treemap on the right, and the largest messages below.](docs/images/gmail-storage-treemap-demo.png)
+
+*Demo view with fictional messages; no real Gmail data is shown.* Larger tiles represent more storage. Select a group or tile to explore its messages, use **Group by** to change the view, and narrow the results with **Find** or **Message size**. The list below shows messages sorted by size. Click **Demo** to try this view without connecting Gmail.
+
 ## Features
 
 - Tiles sized by Gmail's message size estimates, including attachments.

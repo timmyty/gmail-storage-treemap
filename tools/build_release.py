@@ -7,6 +7,7 @@ VERSION = "1.1.0"
 FILES = (
     "gmail_storage_treemap.py", "gmail_storage_core.py", "Start-Gmail-Storage-Treemap.cmd", "Setup.html",
     "README.md", "CHANGELOG.md", ".gitignore", ".gitattributes",
+    "docs/images/gmail-storage-treemap-demo.png",
     "tests/test_storage.py", "tests/test_quota.py", "tests/gui_smoke.py",
     "tools/build_release.py", ".github/workflows/tests.yml",
 )
