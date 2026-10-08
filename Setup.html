@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gmail Storage Treemap — setup</title>
+<style>body{font:17px/1.65 system-ui,sans-serif;max-width:800px;margin:55px auto;padding:0 24px;color:#1b2b42;background:#f4f7fb}h1{font-size:40px;line-height:1.1}h2{margin-top:36px}a{color:#176798}li{margin:12px 0}code{background:#e4eaf1;padding:3px 6px;border-radius:4px}.note{background:white;border-left:4px solid #277d9c;padding:15px 22px}small{color:#53637b}</style></head>
+<body><small>GMAIL STORAGE TREEMAP 1.1 · LOCAL WINDOWS APP</small><h1>Your Gmail, mapped by size.</h1>
+<p>Double-click <b>Start-Gmail-Storage-Treemap.cmd</b> in this folder. Choose <b>Demo</b> to try the treemap, or complete the one-time Google setup below to scan your mailbox.</p>
+<div class="note">Gmail Storage Treemap requests Gmail <b>metadata</b> permission: headers, labels and message size estimates. It cannot read message bodies or attachments, send mail, or delete mail. Your metadata stays in the local app. Sign-in tokens stay in memory and disappear when it closes.</div>
+<h2>One-time Google setup</h2>
+<ol>
+<li>Open <a href="https://console.cloud.google.com/projectcreate">Google Cloud Console</a> and create a project named <b>Gmail Storage Treemap Personal</b>, or select your existing personal project.</li>
+<li>Open the <a href="https://console.cloud.google.com/apis/library/gmail.googleapis.com">Gmail API page</a>, select that project, and enable the API.</li>
+<li>Open <a href="https://console.cloud.google.com/auth/overview">Google Auth Platform</a>. Complete the app branding/contact details. For a personal Gmail account choose <b>External</b> audience, keep it in <b>Testing</b>, and add your own Gmail address under <b>Audience → Test users</b>.</li>
+<li>Under <b>Data Access</b>, add the scope <code>https://www.googleapis.com/auth/gmail.metadata</code>. Do not add send, modify or full-mail access.</li>
+<li>Under <b>Clients</b>, create an OAuth client with application type <b>Desktop app</b>. Download its JSON file. A web-app client will not work with Gmail Storage Treemap.</li>
+<li>In Gmail Storage Treemap, click <b>Connect Gmail…</b> and select the downloaded JSON. Sign in through Google's browser page using the Gmail address you added as a test user, review the requested permission, and grant it if it matches the scope above.</li>
+</ol>
+<p>Google may identify your personal test app as unverified. Check the project and app name yourself. If Google or your Workspace administrator blocks access, resolve that configuration before continuing; Gmail Storage Treemap cannot override it.</p>
+<p>The app lists every message, including Spam and Trash, and retrieves size metadata. A progress dialog shows the current phase, message count, percentage and elapsed time. While listing the mailbox, it shows the number found; the percentage becomes available once listing finishes. Use <b>Scan progress…</b> to reopen a hidden dialog.</p>
+<p>Gmail Storage Treemap budgets 4,800 API quota units per minute, allowing up to about 4 message reads per second under Google's current limits. A large mailbox can take hours. If Google asks it to slow down, all workers pause for at least 65 seconds (or Google's requested wait), then resume more slowly. The dialog displays the cooldown. Keep the app open. <b>Stop scan</b> keeps collected messages and marks the result partial.</p>
+<p><b>Recovering from the earlier quota error:</b> click OK in the old app and use <b>Save snapshot</b> if results were collected. Close the old app and reopen <b>Start-Gmail-Storage-Treemap.cmd</b>; its title now says <b>Gmail Storage Treemap 1.1</b>. Open the saved snapshot, then choose <b>Resume scan…</b>, select the same OAuth client JSON, and sign into the same Gmail account. If there are no collected results, use <b>Connect Gmail…</b> for a fresh scan. Your Google project and credentials do not need to be recreated.</p>
+<h2>Explore your mailbox</h2>
+<ul>
+<li>Group by <b>Sender, Domain, Year, Location, or Label set</b>. Click a tile or select a group to see its messages. Click <b>All mail</b> to return.</li>
+<li>Larger rectangles represent more bytes. Hover for details. The list beneath the map is sorted largest first. Clicking a message tile selects it in the list.</li>
+<li>Use <b>Find</b> to match sender, subject or labels, and the size filter to isolate large messages.</li>
+<li>Select a message, then choose <b>Open selected in Gmail</b> to review it in Gmail.</li>
+<li><b>Save snapshot</b> stores message metadata locally so you can reopen it without another scan. The file includes senders and subjects; keep it private. It contains no access or refresh tokens.</li>
+<li><b>Resume scan…</b> continues an incomplete Gmail snapshot. It lists the mailbox again, drops records no longer present, and retrieves only messages missing from the snapshot. Reused entries retain their previously scanned labels and sizes; choose Connect Gmail for a fresh scan of everything.</li>
+<li><b>Export visible CSV</b> includes all messages matching the current filters and group, across every list page.</li>
+</ul>
+<h2>How the totals work</h2>
+<p>Gmail's API supplies <code>sizeEstimate</code> per message. These totals are estimates of message size, including encoded content, and can differ from Google's billed storage quota. Gmail Storage Treemap does not inspect attachment contents or report attachment-only size. The mailbox can also change during a scan.</p>
+<p>Messages with several labels are counted once. <b>Label set</b> groups by the complete combination of labels. <b>Location</b> assigns each message once, using this order: Trash, Spam, Drafts, Sent, Inbox, then Archived / other.</p>
+<p>A treemap displays the 160 largest groups or messages, plus an <b>Other</b> tile. That tile includes all remaining bytes and can be opened to explore them. Zero-byte records remain in the list.</p>
+<h2>Connection troubleshooting</h2>
+<ul><li><b>Quota / per-minute limit (403 or 429):</b> Gmail Storage Treemap waits and retries automatically. This limit controls scanning speed, not Gmail storage capacity. Run one scan at a time. If quota remains unavailable after repeated waits, save the partial snapshot and resume later. There is no need to add billing or increase quotas for ordinary scanning.</li>
+<li><b>Access denied / other 403:</b> confirm the Gmail API is enabled, your email is a test user, and your organization permits the app.</li>
+<li><b>Invalid client:</b> download credentials for a <b>Desktop app</b>, not a web application.</li>
+<li><b>Timeout:</b> retry Connect Gmail and finish browser sign-in within five minutes. Allow the local callback on <code>127.0.0.1</code>.</li>
+<li><b>Partial scan:</b> a stopped scan or unavailable message is explicitly marked partial. Save it before closing the app, then use Resume scan to continue. Snapshots are not automatically refreshed or saved.</li>
+<li>To revoke permission, open <a href="https://myaccount.google.com/connections">Google Account connections</a> and remove the personal app.</li></ul>
+<p>As an offline fallback, Open snapshot also accepts one extracted <code>.mbox</code> file from <a href="https://takeout.google.com/">Google Takeout</a>. MBOX sizes describe exported bytes, not server quota. Import one All Mail export to avoid duplicates from separate label exports.</p>
+<h2>Files and requirements</h2><p>Requires Python 3.10+ with Tkinter. No pip packages, hosted service or subscription. Keep <code>gmail_storage_treemap.py</code>, <code>gmail_storage_core.py</code>, <code>Setup.html</code> and the launcher together. Nothing is saved automatically.</p>
+<p><small>Reference: <a href="https://developers.google.com/workspace/gmail/api/reference/rest/v1/users.messages">Gmail message size estimates</a>, <a href="https://developers.google.com/workspace/gmail/api/auth/scopes">Gmail scopes</a>, <a href="https://developers.google.com/identity/protocols/oauth2/native-app">Google Desktop OAuth</a>, <a href="https://developers.google.com/workspace/gmail/api/reference/quota">current Gmail API quotas</a>.</small></p>
+</body></html>

@@ -1,0 +1,33 @@
+# Local Gmail data and OAuth credentials must never be committed.
+*.json
+*.jsonl
+*.csv
+*.mbox
+*.eml
+*.sqlite
+*.sqlite3
+*.db
+*.pem
+*.key
+.env
+.env.*
+credentials/
+snapshots/
+exports/
+
+# Python, editors, and release output.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+dist/
+build/
+*.zip
+*.log
