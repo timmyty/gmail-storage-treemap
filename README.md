@@ -39,17 +39,13 @@ The source may also run on other platforms with Tkinter installed, but the deskt
 
 Each user supplies their own Google OAuth Desktop app client. **No Google credentials are distributed with this project.**
 
-1. Create a personal project in [Google Cloud Console](https://console.cloud.google.com/projectcreate).
-2. Enable the [Gmail API](https://console.cloud.google.com/apis/library/gmail.googleapis.com).
-3. Configure Google Auth Platform. For a personal Gmail account, choose an External audience, keep the app in Testing, and add your Gmail address as a test user.
-4. Add this scope under Data Access:
-
-   ```text
-   https://www.googleapis.com/auth/gmail.metadata
-   ```
-
-5. Create an OAuth client with application type **Desktop app**, then download its JSON file.
-6. Click **Connect Gmail…** in Gmail Storage Treemap, select that file, and complete Google's browser sign-in and permission review.
+One-time Google setup
+    1. Open Google Cloud Console and create a project named Gmail Storage Treemap Personal, or select your existing personal project. 
+    2. Open the Gmail API page, select that project, and enable the API. 
+    3. Open Google Auth Platform. Complete the app branding/contact details. For a personal Gmail account choose External audience, keep it in Testing, and add your own Gmail address under Audience → Test users. 
+    4. Under Data Access, add the scope https://www.googleapis.com/auth/gmail.metadata. Do not add send, modify or full-mail access. 
+    5. Under Clients, create an OAuth client with application type Desktop app. Download its JSON file. A web-app client will not work with Gmail Storage Treemap. 
+    6. In Gmail Storage Treemap, click Connect Gmail… and select the downloaded JSON. Sign in through Google's browser page using the Gmail address you added as a test user, review the requested permission, and grant it if it matches the scope above. 
 
 Open [Setup.html](Setup.html) in your browser for detailed instructions and troubleshooting. Google Workspace organizations may restrict app access. This project does not bypass those restrictions or Google's app verification requirements.
 
