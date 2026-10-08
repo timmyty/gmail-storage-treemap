@@ -39,13 +39,21 @@ The source may also run on other platforms with Tkinter installed, but the deskt
 
 Each user supplies their own Google OAuth Desktop app client. **No Google credentials are distributed with this project.**
 
-One-time Google setup
-    1. Open Google Cloud Console and create a project named Gmail Storage Treemap Personal, or select your existing personal project. 
-    2. Open the Gmail API page, select that project, and enable the API. 
-    3. Open Google Auth Platform. Complete the app branding/contact details. For a personal Gmail account choose External audience, keep it in Testing, and add your own Gmail address under Audience → Test users. 
-    4. Under Data Access, add the scope https://www.googleapis.com/auth/gmail.metadata. Do not add send, modify or full-mail access. 
-    5. Under Clients, create an OAuth client with application type Desktop app. Download its JSON file. A web-app client will not work with Gmail Storage Treemap. 
-    6. In Gmail Storage Treemap, click Connect Gmail… and select the downloaded JSON. Sign in through Google's browser page using the Gmail address you added as a test user, review the requested permission, and grant it if it matches the scope above. 
+### One-time Google setup
+
+Use the same Google Cloud project throughout these steps. If you already configured a personal project for this app, you can reuse it.
+
+1. **Create or select a project.** Open [Google Cloud Console](https://console.cloud.google.com/projectcreate) and create a project named **Gmail Storage Treemap Personal**, or select your existing personal project using the project selector at the top of the page.
+
+2. **Enable the Gmail API.** Open the [Gmail API page](https://console.cloud.google.com/apis/library/gmail.googleapis.com), confirm that the correct project is selected, and click **Enable**. If the API is already enabled, continue to the next step.
+
+3. **Configure the consent screen and test user.** Open [Google Auth Platform](https://console.cloud.google.com/auth/overview). If prompted, click **Get Started** and complete the app name, user support email, and developer contact details. For a personal Gmail account, choose an **External** audience. Keep the app's publishing status in **Testing**. Under **Audience → Test users**, click **Add users**, enter the Gmail address you want to scan, and click **Save**.
+
+4. **Add the metadata scope.** Under **Data Access**, click **Add or Remove Scopes** and select `https://www.googleapis.com/auth/gmail.metadata`, then save your changes. This allows the app to read message metadata such as headers and labels. Do not add send, modify, or full-mail access; this app only requests the metadata scope.
+
+5. **Create a Desktop app client and download its JSON.** Under **Clients**, click **Create Client**, set **Application type** to **Desktop app**, give the client a recognizable name, and click **Create**. Download the client's JSON file and keep it in a private local folder. A **Web application** client will not work with Gmail Storage Treemap. Do not upload the JSON to GitHub or share it with others.
+
+6. **Connect from Gmail Storage Treemap.** Open the app, click **Connect Gmail…**, and select the downloaded JSON file. In Google's browser sign-in flow, choose the same Gmail address you added under **Test users**. Review the app name and requested permission, and grant access if they match your personal project and the metadata scope above. Return to the app to follow the scan in its progress dialog.
 
 Open [Setup.html](Setup.html) in your browser for detailed instructions and troubleshooting. Google Workspace organizations may restrict app access. This project does not bypass those restrictions or Google's app verification requirements.
 
