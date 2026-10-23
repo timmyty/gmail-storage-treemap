@@ -112,11 +112,23 @@ def treemap(items, x, y, width, height):
     return treemap(items[:cut], x, y, width, h) + treemap(items[cut:], x, y + h, width, height - h)
 
 
+class SameHostRedirects(urllib.request.HTTPRedirectHandler):
+    """urllib forwards the Authorization header on redirects; only follow them to the same https host."""
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        old, new = urllib.parse.urlparse(req.full_url), urllib.parse.urlparse(newurl)
+        if new.scheme.lower() != "https" or new.hostname != old.hostname:
+            raise urllib.error.HTTPError(req.full_url, code, "Refused a redirect to another host", headers, fp)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+OPENER = urllib.request.build_opener(SameHostRedirects)
+
+
 def request_json(url, data=None, headers=None):
     body = urllib.parse.urlencode(data).encode() if data is not None else None
     request = urllib.request.Request(url, data=body, headers=headers or {})
     try:
-        with urllib.request.urlopen(request, timeout=30) as response:
+        with OPENER.open(request, timeout=30) as response:
             return json.load(response)
     except urllib.error.HTTPError as exc:
         # Never put the request URL, token or client secret in error reports.
@@ -223,6 +235,8 @@ def authorize(client_file, stop, progress):
     result = {}
 
     class Callback(http.server.BaseHTTPRequestHandler):
+        timeout = 10  # a stalled local connection must not block the sign-in wait loop
+
         def do_GET(self):
             parsed = urllib.parse.urlparse(self.path)
             params = urllib.parse.parse_qs(parsed.query)
@@ -437,6 +451,20 @@ def import_mbox(path, stop, progress):
     return {"version": 1, "source": "MBOX exported message bytes", "account": "",
             "scannedAt": dt.datetime.now(dt.timezone.utc).isoformat(),
             "complete": not stop.is_set(), "failed": 0, "messages": messages}
+
+
+def resume_warning(snapshot):
+    """Confirmation text shown before every resume. Resumed entries are reused as they are in the file."""
+    return "\n".join([
+        "Never resume a snapshot made by someone else. Only resume snapshots you saved yourself.",
+        "Messages already in the snapshot are kept without being checked again, so a snapshot from "
+        "another person could add entries that are not in your mailbox.",
+        "",
+        f"Account: {snapshot.get('account') or 'Unknown'}",
+        f"Scanned: {snapshot.get('scannedAt') or 'Unknown'}",
+        f"Messages already collected: {len(snapshot.get('messages', [])):,}",
+        "",
+        "Continue only if you made this snapshot and recognise these details."])
 
 
 def validate_snapshot(data):

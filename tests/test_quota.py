@@ -38,11 +38,26 @@ class QuotaTests(unittest.TestCase):
         self.assertFalse(core.ApiError(403, 'Daily quota exceeded', ['dailyLimitExceeded']).rate_limited)
         self.assertFalse(core.ApiError(403, 'Access denied', ['domainPolicy']).rate_limited)
 
+    def test_redirects_never_carry_tokens_to_another_host(self):
+        handler = core.SameHostRedirects()
+        request = core.urllib.request.Request('https://gmail.googleapis.com/gmail/v1/users/me/profile', headers={'Authorization': 'Bearer secret'})
+        for target in ('https://evil.example/', 'http://gmail.googleapis.com/gmail/v1/users/me/profile'):
+            with self.assertRaises(HTTPError):
+                handler.redirect_request(request, io.BytesIO(), 302, 'Found', {}, target)
+        same = handler.redirect_request(request, io.BytesIO(), 302, 'Found', {}, 'https://gmail.googleapis.com/other')
+        self.assertEqual(same.full_url, 'https://gmail.googleapis.com/other')
+
+    def test_resume_warning_tells_users_to_use_only_their_own_snapshots(self):
+        text = core.resume_warning({'account': 'me@gmail.com', 'scannedAt': '2026-10-01', 'messages': [{}, {}]})
+        self.assertIn('Never resume a snapshot made by someone else', text)
+        self.assertIn('me@gmail.com', text)
+        self.assertIn('Messages already collected: 2', text)
+
     def test_error_json_reasons_and_retry_after_are_preserved(self):
         body = {'error': {'message': QUOTA_ERROR, 'errors': [{'reason': 'quotaExceeded'}],
                           'details': [{'reason': 'RATE_LIMIT_EXCEEDED', 'retryDelay': '65s'}]}}
         error = HTTPError('https://gmail.googleapis.com/', 403, 'Forbidden', {'Retry-After': '90'}, io.BytesIO(json.dumps(body).encode()))
-        with patch.object(core.urllib.request, 'urlopen', side_effect=error):
+        with patch.object(core.OPENER, 'open', side_effect=error):
             with self.assertRaises(core.ApiError) as caught:
                 core.request_json('https://gmail.googleapis.com/')
         self.assertTrue(caught.exception.rate_limited)
