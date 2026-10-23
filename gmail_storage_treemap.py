@@ -13,7 +13,7 @@ import urllib.parse
 import webbrowser
 
 from gmail_storage_core import (Cancelled, authorize, demo_snapshot, group_key, groups,
-                          import_mbox, readable_size, scan_gmail, treemap, validate_snapshot)
+                          import_mbox, readable_size, resume_warning, scan_gmail, treemap, validate_snapshot)
 
 BASE = Path(__file__).resolve().parent
 COLORS = ["#236983", "#69509f", "#217b69", "#9b5b32", "#8e466b", "#466a9c", "#65732e", "#8d5050"]
@@ -190,6 +190,10 @@ class StorageTreemap(tk.Tk):
         self.resume_button.configure(state="normal" if resumable else "disabled")
 
     def connect(self, resume=False):
+        if resume and self.snapshot and not messagebox.askyesno(
+                "Gmail Storage Treemap — Resume scan", resume_warning(self.snapshot),
+                icon="warning", default="no", parent=self):
+            return
         filename = filedialog.askopenfilename(title="Select your Google Desktop app OAuth client JSON", filetypes=[("Google OAuth client", "*.json")])
         if not filename:
             return
@@ -402,7 +406,7 @@ class StorageTreemap(tk.Tk):
                 writer = csv.writer(stream)
                 writer.writerow(["Sender", "Subject", "Date", "Bytes", "Labels"])
                 for row in self.current_messages:
-                    writer.writerow([safe_cell(row["sender"]), safe_cell(row["subject"]), row["date"], row["size"], safe_cell("; ".join(row.get("labels", [])))])
+                    writer.writerow([safe_cell(row["sender"]), safe_cell(row["subject"]), safe_cell(row["date"]), row["size"], safe_cell("; ".join(row.get("labels", [])))])
             self.status.set(f"Exported {len(self.current_messages):,} messages from this view.")
         except OSError as exc:
             messagebox.showerror("Cannot export", str(exc))
